@@ -138,7 +138,7 @@ jobs:
           push: true
           tags: s418963/taski_gateway:latest
 
-  deploy:
+    deploy:
     runs-on: ubuntu-latest
     needs:
       - build_and_push_to_docker_hub
@@ -167,12 +167,23 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /home/yc-user/taski
+            
+            # Остановим старый nginx, если мешает
+            sudo systemctl stop nginx || true
+            sudo systemctl disable nginx || true
+            
+            # Запустим новые контейнеры
             docker compose -f docker-compose.production.yml pull
             docker compose -f docker-compose.production.yml down
             docker compose -f docker-compose.production.yml up -d
-            # Миграции и статика
+            
+            # Подождём, пока БД станет готова (10 секунд)
+            sleep 10
+            
+            # Миграции и сбор статики
             docker compose -f docker-compose.production.yml run --rm backend python manage.py migrate
             docker compose -f docker-compose.production.yml run --rm backend python manage.py collectstatic --noinput
-            # Копирование статики (если нужно)
-            mkdir -p /backend_static/static
-            docker compose -f docker-compose.production.yml cp backend:/app/collected_static/. /backend_static/static/
+            
+            # Копируем статику в домашнюю папку (без ошибок прав!)
+            mkdir -p /home/yc-user/backend_static/static
+            docker compose -f docker-compose.production.yml cp backend:/app/collected_static/. /home/yc-user/backend_static/static/
