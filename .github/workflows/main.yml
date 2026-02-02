@@ -167,22 +167,28 @@ jobs:
           script: |
             cd /home/yc-user/taski
             
-            # Остановим старый nginx, если мешает
+            # Остановим старый nginx
             sudo systemctl stop nginx || true
-            sudo systemctl disable nginx || true
+            
+            # Удалим orphan containers
+            docker compose -f docker-compose.production.yml down --remove-orphans
             
             # Запустим новые контейнеры
             docker compose -f docker-compose.production.yml pull
-            docker compose -f docker-compose.production.yml down
             docker compose -f docker-compose.production.yml up -d
             
-            # Подождём, пока БД станет готова (10 секунд)
-            sleep 10
+            # Подождём 15 секунд
+            sleep 15
             
-            # Миграции и сбор статики
+            # Миграции
             docker compose -f docker-compose.production.yml run --rm backend python manage.py migrate
+            
+            # Сбор статики
             docker compose -f docker-compose.production.yml run --rm backend python manage.py collectstatic --noinput
             
-            # Копируем статику в домашнюю папку (без ошибок прав!)
-            mkdir -p /home/yc-user/backend_static/static
-            docker compose -f docker-compose.production.yml cp backend:/app/collected_static/. /home/yc-user/backend_static/static/
+            # Создадим целевую папку с правами
+            sudo mkdir -p /home/yc-user/backend_static/static
+            sudo chown -R yc-user:yc-user /home/yc-user/backend_static
+            
+            # Копируем статику
+            docker compose -f docker-compose.production.yml cp backend:/app/collected_static /home/yc-user/backend_static/static
