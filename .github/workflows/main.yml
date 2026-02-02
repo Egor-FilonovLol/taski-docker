@@ -192,3 +192,14 @@ jobs:
             
             # Копируем статику
             docker compose -f docker-compose.production.yml cp backend:/app/collected_static /home/yc-user/backend_static/static
+
+  send_message:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Send message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: Деплой успешно выполнен!
