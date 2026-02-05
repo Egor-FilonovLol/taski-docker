@@ -1,6 +1,8 @@
+version: '3'
+
 volumes:
   pg_data_production:
-  static_volume:
+  media_volume:
 
 services:
   db:
@@ -10,13 +12,28 @@ services:
       - pg_data_production:/var/lib/postgresql/data
 
   backend:
-    image: s418963/taski_backend
+    image: s418963/taski_backend:latest
+    depends_on: 
+      - db
     env_file: .env
-
+    volumes:
+      - ./backend_static:/app/collected_static
+      - media_volume:/app/media
+    
+  frontend:  
+    image: s418963/taski_frontend:latest
+    volumes:
+      - ./backend_static/static:/app/static
+    command: cp -r /app/build/. /app/static/
+    
   gateway:
-    image: s418963/taski_gateway
+    image: s418963/taski_gateway:latest
     env_file: .env
+    depends_on:
+      - backend
+      - frontend 
     ports:
       - "8080:80"
     volumes:
-      - /home/yc-user/backend_static:/staticfiles ######
+      - ./backend_static:/staticfiles
+      - media_volume:/app/media
