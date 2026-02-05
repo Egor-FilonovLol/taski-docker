@@ -2,7 +2,6 @@ FROM python:3.9
 
 WORKDIR /app
 
-# Установка зависимостей
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip setuptools
 RUN pip install --no-cache-dir gunicorn==23.0.0
@@ -14,7 +13,6 @@ COPY . .
 # Создание папки для статики (на случай, если её нет)
 RUN mkdir -p /app/collected_static
 
-# Проверка, что Django установлен
 RUN python -c "import django; print(django.get_version())"
 
 # Запуск Gunicorn

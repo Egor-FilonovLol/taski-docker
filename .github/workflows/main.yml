@@ -160,37 +160,31 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.HOST }}
+          host: ${{ secrets.HOST }}                                                                                                                                                                                                                                                                                                                                                                                                                                           
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /home/yc-user/taski
             
-            # Остановим старый nginx
             sudo systemctl stop nginx || true
             
-            # Удалим orphan containers
             docker compose -f docker-compose.production.yml down --remove-orphans
             
-            # Запустим новые контейнеры
             docker compose -f docker-compose.production.yml pull
             docker compose -f docker-compose.production.yml up -d
             
-            # Подождём 15 секунд
             sleep 15
             
             # Миграции
             docker compose -f docker-compose.production.yml run --rm backend python manage.py migrate
             
-            # Сбор статики
+
             docker compose -f docker-compose.production.yml run --rm backend python manage.py collectstatic --noinput
             
-            # Создадим целевую папку с правами
             sudo mkdir -p /home/yc-user/backend_static/static
             sudo chown -R yc-user:yc-user /home/yc-user/backend_static
             
-            # Копируем статику
             docker compose -f docker-compose.production.yml cp backend:/app/collected_static /home/yc-user/backend_static/static
 
   send_message:
