@@ -2,7 +2,6 @@ version: '3'
 
 volumes:
   pg_data_production:
-  media_volume:
 
 services:
   db:
@@ -18,7 +17,6 @@ services:
     env_file: .env
     volumes:
       - ./backend_static:/app/collected_static
-      - media_volume:/app/media
     
   frontend:  
     image: s418963/taski_frontend:latest
@@ -36,4 +34,3 @@ services:
       - "8080:80"
     volumes:
       - ./backend_static:/staticfiles
-      - media_volume:/app/media
