@@ -137,7 +137,7 @@ jobs:
           push: true
           tags: s418963/taski_gateway:latest
 
-  deploy:
+    deploy:
     runs-on: ubuntu-latest
     needs:
       - build_and_push_to_docker_hub
@@ -160,33 +160,27 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.HOST }}                                                                                                                                                                                                                                                                                                                                                                                                                                           
+          host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /home/yc-user/taski
             
-            sudo systemctl stop nginx || true
+            mkdir -p backend_static/static
+            
+            docker run --rm -v $(pwd)/backend_static/static:/app/static s418963/taski_frontend:latest
             
             docker compose -f docker-compose.production.yml down --remove-orphans
-            
             docker compose -f docker-compose.production.yml pull
             docker compose -f docker-compose.production.yml up -d
             
-            sleep 15
+            sleep 10
             
-            # Миграции
-            docker compose -f docker-compose.production.yml run --rm backend python manage.py migrate
+            docker compose -f docker-compose.production.yml exec backend python manage.py migrate --noinput
             
-
-            docker compose -f docker-compose.production.yml run --rm backend python manage.py collectstatic --noinput
+            docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
             
-            sudo mkdir -p /home/yc-user/backend_static/static
-            sudo chown -R yc-user:yc-user /home/yc-user/backend_static
-            
-            docker compose -f docker-compose.production.yml cp backend:/app/collected_static /home/yc-user/backend_static/static
-
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
