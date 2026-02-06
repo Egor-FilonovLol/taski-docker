@@ -34,6 +34,3 @@ services:
       - "8080:80"
     volumes:
       - backend_static:/staticfiles
-
-volumes:
-  backend_static:
