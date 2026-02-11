@@ -12,3 +12,4 @@ COPY . .
 RUN mkdir -p /app/collected_static
 
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "backend.wsgi"]
+##
