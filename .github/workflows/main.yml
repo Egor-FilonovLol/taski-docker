@@ -159,7 +159,6 @@ jobs:
             sudo docker compose -f docker-compose.production.yml up -d
             sleep 30
             sudo docker compose -f docker-compose.production.yml exec -T backend python manage.py migrate --noinput
-            sudo docker compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic --noinput --clear
             sudo docker compose -f docker-compose.production.yml ps
 
   send_message:
