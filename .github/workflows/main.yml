@@ -156,14 +156,13 @@ jobs:
             sudo docker compose -f docker-compose.production.yml down -v
             sleep 10
             sudo docker compose -f docker-compose.production.yml pull
-            sudo docker compose -f docker-compose.production.yml up -d
+            sudo docker compose -f docker-compose.production.yml up -d db backend
             sleep 30
             sudo docker compose -f docker-compose.production.yml exec -T backend python manage.py migrate --noinput
-            sudo docker compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic --noinput
-            sudo docker run --rm \
-            -v taski_static:/static \
-            s418963/taski_frontend:latest \
-            sh -c "cp -r /app/build/. /static/"
+            sudo docker compose -f docker-compose.production.yml exec - T backend python manage.py collectstatic --noinput
+            sudo docker compose -f docker-compose.production.yml up -d frontend
+            sudo docker compose -f docker-compose.production.yml up -d gateway
+            sleep 5
             sudo docker compose -f docker-compose.production.yml ps
 
   send_message:
