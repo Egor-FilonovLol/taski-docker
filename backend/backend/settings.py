@@ -13,6 +13,7 @@ ALLOWED_HOSTS = [
     'lolkekcheburek.servequake.com/',
     'localhost',
     '127.0.0.1',
+    '158.160.8.222',
 ]
 
 
@@ -116,7 +117,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/app/collected_static'
+STATIC_ROOT = '/app/static'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

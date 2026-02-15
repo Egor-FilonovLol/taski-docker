@@ -17,7 +17,7 @@ services:
       - db
     env_file: .env
     volumes:
-      - static_volume:/app/collected_static
+      - static_volume:/app/static
     
   frontend:  
     image: s418963/taski_frontend:latest
@@ -33,5 +33,5 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - static_volume:/staticfiles
+      - static_volume:/static
       - frontend_build:/frontend_build
