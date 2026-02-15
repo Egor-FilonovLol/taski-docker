@@ -19,8 +19,9 @@ services:
   frontend:  
     image: s418963/taski_frontend:latest
     volumes:
-      - static:/static       
-    command: cp -r /app/build/. /static/
+    - static:/static       
+    command: sh -c "cp -r /app/build/. /static/"
+    restart: "no"
 
   gateway:
     image: s418963/taski_gateway:latest
